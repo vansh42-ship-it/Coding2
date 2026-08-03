@@ -1,0 +1,2855 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "e17fea16-e765-49e6-9297-3c0479d0d76d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "86fb154a-3b33-4487-9c60-ad720bbb70db",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.impute import SimpleImputer\n",
+    "from sklearn.preprocessing import OneHotEncoder\n",
+    "from sklearn.preprocessing import OrdinalEncoder"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "6d494d11-1705-4e41-8ef2-9124465fde83",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('covid_toy.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "5ef699ab-af12-47e6-8d04-04bbf0456807",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>fever</th>\n",
+       "      <th>cough</th>\n",
+       "      <th>city</th>\n",
+       "      <th>has_covid</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>60</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>103.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>27</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>100.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Delhi</td>\n",
+       "      <td>Yes</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>42</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Delhi</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>31</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>98.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>65</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Mumbai</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>95</th>\n",
+       "      <td>12</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>104.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>96</th>\n",
+       "      <td>51</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>Yes</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>97</th>\n",
+       "      <td>20</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>98</th>\n",
+       "      <td>5</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>98.0</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Mumbai</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>99</th>\n",
+       "      <td>10</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>98.0</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>Yes</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>100 rows × 6 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age  gender  fever   cough       city has_covid\n",
+       "0    60    Male  103.0    Mild    Kolkata        No\n",
+       "1    27    Male  100.0    Mild      Delhi       Yes\n",
+       "2    42    Male  101.0    Mild      Delhi        No\n",
+       "3    31  Female   98.0    Mild    Kolkata        No\n",
+       "4    65  Female  101.0    Mild     Mumbai        No\n",
+       "..  ...     ...    ...     ...        ...       ...\n",
+       "95   12  Female  104.0    Mild  Bangalore        No\n",
+       "96   51  Female  101.0  Strong    Kolkata       Yes\n",
+       "97   20  Female  101.0    Mild  Bangalore        No\n",
+       "98    5  Female   98.0  Strong     Mumbai        No\n",
+       "99   10  Female   98.0  Strong    Kolkata       Yes\n",
+       "\n",
+       "[100 rows x 6 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "1b98c381-e312-4226-a792-6071cc6449c2",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>fever</th>\n",
+       "      <th>cough</th>\n",
+       "      <th>city</th>\n",
+       "      <th>has_covid</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>60</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>103.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>27</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>100.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Delhi</td>\n",
+       "      <td>Yes</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>42</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Delhi</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>31</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>98.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Kolkata</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>65</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Mumbai</td>\n",
+       "      <td>No</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   age  gender  fever cough     city has_covid\n",
+       "0   60    Male  103.0  Mild  Kolkata        No\n",
+       "1   27    Male  100.0  Mild    Delhi       Yes\n",
+       "2   42    Male  101.0  Mild    Delhi        No\n",
+       "3   31  Female   98.0  Mild  Kolkata        No\n",
+       "4   65  Female  101.0  Mild   Mumbai        No"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "23a7f829-f7d3-44a7-850f-597a391b4ec8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "cough\n",
+       "Mild      62\n",
+       "Strong    38\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['cough'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "a424b964-431c-442b-964e-381363feb6c6",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "city\n",
+       "Kolkata      32\n",
+       "Bangalore    30\n",
+       "Delhi        22\n",
+       "Mumbai       16\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['city'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "5806d0e5-ebc8-4aac-ab82-593f3d908520",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "fever\n",
+       "101.0    17\n",
+       "98.0     17\n",
+       "104.0    14\n",
+       "100.0    13\n",
+       "99.0     10\n",
+       "102.0    10\n",
+       "103.0     9\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['fever'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "9dee5b16-2561-41ec-a8ab-d9a9d605ea74",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "age           0\n",
+       "gender        0\n",
+       "fever        10\n",
+       "cough         0\n",
+       "city          0\n",
+       "has_covid     0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6c8780fc-a674-4c46-87cd-2c1df4207a4f",
+   "metadata": {},
+   "source": [
+    "#train_test_split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "f3fa8f6e-5ef3-423a-a6dc-78b30b1f2ac4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "x_train,x_test,y_train,y_test = train_test_split(df.drop(columns=['has_covid']), df['has_covid'],test_size = 0.2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "5b84ab00-7c5d-48e1-8550-0d644151d0f0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>gender</th>\n",
+       "      <th>fever</th>\n",
+       "      <th>cough</th>\n",
+       "      <th>city</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>34</th>\n",
+       "      <td>74</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Mumbai</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>29</th>\n",
+       "      <td>34</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Mumbai</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>64</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>59</th>\n",
+       "      <td>6</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>104.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Kolkata</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>67</th>\n",
+       "      <td>65</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>99.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>76</th>\n",
+       "      <td>80</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>100.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>87</th>\n",
+       "      <td>47</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>101.0</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Bangalore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>69</th>\n",
+       "      <td>73</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>103.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Delhi</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>84</th>\n",
+       "      <td>69</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>98.0</td>\n",
+       "      <td>Strong</td>\n",
+       "      <td>Mumbai</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>95</th>\n",
+       "      <td>12</td>\n",
+       "      <td>Female</td>\n",
+       "      <td>104.0</td>\n",
+       "      <td>Mild</td>\n",
+       "      <td>Bangalore</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>80 rows × 5 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    age  gender  fever   cough       city\n",
+       "34   74    Male  102.0    Mild     Mumbai\n",
+       "29   34  Female    NaN  Strong     Mumbai\n",
+       "13   64    Male  102.0    Mild  Bangalore\n",
+       "59    6  Female  104.0    Mild    Kolkata\n",
+       "67   65    Male   99.0    Mild  Bangalore\n",
+       "..  ...     ...    ...     ...        ...\n",
+       "76   80    Male  100.0    Mild  Bangalore\n",
+       "87   47    Male  101.0  Strong  Bangalore\n",
+       "69   73  Female  103.0    Mild      Delhi\n",
+       "84   69  Female   98.0  Strong     Mumbai\n",
+       "95   12  Female  104.0    Mild  Bangalore\n",
+       "\n",
+       "[80 rows x 5 columns]"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "da869fc7-b934-483b-92a3-6c2076172666",
+   "metadata": {},
+   "source": [
+    "1.Aam zindagi"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "d0893311-eac4-4df6-99b0-962ef70684b5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#missing fever cols\n",
+    "#adding simpleimpute to fever columns\n",
+    "si = SimpleImputer()\n",
+    "x_train_fever = si.fit_transform(x_train[['fever']])\n",
+    "\n",
+    "#also the test data\n",
+    "x_test_fever = si.fit_transform(x_test[['fever']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "174406c9-e526-4be3-9cf6-500a817f9f7a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(80, 1)"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_fever.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "d24c3618-bb46-4381-8af7-cb7785435527",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#OrdinalEncoding -> cough\n",
+    "oe = OrdinalEncoder(categories=[['Mild','Strong']])\n",
+    "x_train_cough = oe.fit_transform(x_train[['cough']])\n",
+    "\n",
+    "#also test data.\n",
+    "x_test_cough = oe.fit_transform(x_test[['cough']])\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "b42016c0-134f-4a70-aa44-18f9c9800466",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(80, 1)"
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_cough.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "8a6173fb-0e23-4763-8975-415213a94dd5",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.],\n",
+       "       [1.],\n",
+       "       [0.]])"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_cough"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "41fba36d-bd31-48fb-815d-42ab6f9948ef",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#onehot encodings -> gender,city\n",
+    "ohe = OneHotEncoder(drop='first')\n",
+    "x_train_gender_city = ohe.fit_transform(x_train[['gender', 'city']])\n",
+    "\n",
+    "#also the test data \n",
+    "x_test_gender_city = ohe.fit_transform(x_test[['gender', 'city']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "b4171b03-2ff9-4dec-9eef-34e238e8bacf",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<80x4 sparse matrix of type '<class 'numpy.float64'>'\n",
+       "\twith 89 stored elements in Compressed Sparse Row format>"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_gender_city"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "bd4ca104-4177-48a4-b145-1b66f1f7246e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(80, 4)"
+      ]
+     },
+     "execution_count": 27,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_gender_city.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "1dc31afa-19ce-4bc3-8f8b-1f8991530686",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<20x4 sparse matrix of type '<class 'numpy.float64'>'\n",
+       "\twith 22 stored elements in Compressed Sparse Row format>"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_test_gender_city"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "09f6af1e-488f-48ad-a9ed-8ad311427e1c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(20, 4)"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_test_gender_city.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "8bc64661-5236-459b-b817-58886b3a7d74",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<80x4 sparse matrix of type '<class 'numpy.float64'>'\n",
+       "\twith 89 stored elements in Compressed Sparse Row format>"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_gender_city"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "22bccc38-3228-447d-875d-5f050a58abb3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#extract age -> taken age\n",
+    "x_train_age  = x_train.drop(columns=['gender', 'fever', 'city', 'city']).values\n",
+    "\n",
+    "#also the test data\n",
+    "x_test_age  = x_test.drop(columns=['gender', 'fever', 'city', 'city']).values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "6d479111-5c00-41b2-a0ed-5721e5006ba4",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[74, 'Mild'],\n",
+       "       [34, 'Strong'],\n",
+       "       [64, 'Mild'],\n",
+       "       [6, 'Mild'],\n",
+       "       [65, 'Mild'],\n",
+       "       [69, 'Mild'],\n",
+       "       [65, 'Mild'],\n",
+       "       [70, 'Strong'],\n",
+       "       [26, 'Mild'],\n",
+       "       [49, 'Mild'],\n",
+       "       [34, 'Strong'],\n",
+       "       [25, 'Mild'],\n",
+       "       [24, 'Strong'],\n",
+       "       [83, 'Mild'],\n",
+       "       [22, 'Mild'],\n",
+       "       [34, 'Strong'],\n",
+       "       [14, 'Mild'],\n",
+       "       [5, 'Strong'],\n",
+       "       [51, 'Mild'],\n",
+       "       [12, 'Strong'],\n",
+       "       [83, 'Mild'],\n",
+       "       [73, 'Mild'],\n",
+       "       [17, 'Mild'],\n",
+       "       [38, 'Mild'],\n",
+       "       [14, 'Strong'],\n",
+       "       [13, 'Strong'],\n",
+       "       [60, 'Mild'],\n",
+       "       [50, 'Mild'],\n",
+       "       [83, 'Mild'],\n",
+       "       [44, 'Mild'],\n",
+       "       [38, 'Mild'],\n",
+       "       [31, 'Mild'],\n",
+       "       [54, 'Strong'],\n",
+       "       [15, 'Mild'],\n",
+       "       [8, 'Mild'],\n",
+       "       [25, 'Strong'],\n",
+       "       [19, 'Strong'],\n",
+       "       [49, 'Mild'],\n",
+       "       [5, 'Mild'],\n",
+       "       [11, 'Mild'],\n",
+       "       [33, 'Strong'],\n",
+       "       [71, 'Strong'],\n",
+       "       [42, 'Mild'],\n",
+       "       [65, 'Mild'],\n",
+       "       [51, 'Mild'],\n",
+       "       [60, 'Mild'],\n",
+       "       [20, 'Strong'],\n",
+       "       [23, 'Mild'],\n",
+       "       [16, 'Mild'],\n",
+       "       [72, 'Mild'],\n",
+       "       [71, 'Strong'],\n",
+       "       [24, 'Mild'],\n",
+       "       [20, 'Mild'],\n",
+       "       [59, 'Strong'],\n",
+       "       [68, 'Strong'],\n",
+       "       [51, 'Strong'],\n",
+       "       [19, 'Mild'],\n",
+       "       [20, 'Strong'],\n",
+       "       [34, 'Strong'],\n",
+       "       [23, 'Strong'],\n",
+       "       [16, 'Mild'],\n",
+       "       [19, 'Mild'],\n",
+       "       [5, 'Mild'],\n",
+       "       [48, 'Mild'],\n",
+       "       [56, 'Strong'],\n",
+       "       [64, 'Mild'],\n",
+       "       [42, 'Strong'],\n",
+       "       [64, 'Mild'],\n",
+       "       [49, 'Strong'],\n",
+       "       [18, 'Mild'],\n",
+       "       [27, 'Mild'],\n",
+       "       [42, 'Mild'],\n",
+       "       [27, 'Mild'],\n",
+       "       [46, 'Strong'],\n",
+       "       [84, 'Mild'],\n",
+       "       [80, 'Mild'],\n",
+       "       [47, 'Strong'],\n",
+       "       [73, 'Mild'],\n",
+       "       [69, 'Strong'],\n",
+       "       [12, 'Mild']], dtype=object)"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_age"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "59d9b77b-83ba-4abb-a974-f2e37e9c8d78",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(80, 2)"
+      ]
+     },
+     "execution_count": 34,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_age.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "88821314-1895-4144-924f-90aa4447456c",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "all the input arrays must have same number of dimensions, but the array at index 0 has 2 dimension(s) and the array at index 2 has 0 dimension(s)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[40], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m X_train_transformed \u001b[38;5;241m=\u001b[39m np\u001b[38;5;241m.\u001b[39mconcatenate((x_train_age, x_train_fever, x_train_gender_city, x_train_cough), axis\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m1\u001b[39m)\n\u001b[0;32m      2\u001b[0m \u001b[38;5;66;03m#also test data.\u001b[39;00m\n\u001b[0;32m      3\u001b[0m X_test_transformed \u001b[38;5;241m=\u001b[39m np\u001b[38;5;241m.\u001b[39mconcatenate((x_test_age, x_test_fever, x_test_gender_city, x_test_cough), axis\u001b[38;5;241m=\u001b[39m\u001b[38;5;241m1\u001b[39m)\n",
+      "\u001b[1;31mValueError\u001b[0m: all the input arrays must have same number of dimensions, but the array at index 0 has 2 dimension(s) and the array at index 2 has 0 dimension(s)"
+     ]
+    }
+   ],
+   "source": [
+    "X_train_transformed = np.concatenate((x_train_age, x_train_fever, x_train_gender_city, x_train_cough), axis=1)\n",
+    "#also test data.\n",
+    "X_test_transformed = np.concatenate((x_test_age, x_test_fever, x_test_gender_city, x_test_cough), axis=1)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "2bca13c0-c81e-45be-9073-bd2ae631932d",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'X_train_transformed' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[41], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m X_train_transformed\n",
+      "\u001b[1;31mNameError\u001b[0m: name 'X_train_transformed' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "X_train_transformed"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "962b950f-53db-4f4d-aee6-d91972ec2f32",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'X_train_transformed' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[42], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m X_train_transformed\u001b[38;5;241m.\u001b[39mshape\n",
+      "\u001b[1;31mNameError\u001b[0m: name 'X_train_transformed' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "X_train_transformed.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8b76af80-15bc-4ff5-a73e-295a9a69539a",
+   "metadata": {},
+   "source": [
+    "#Mentos zindagi"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "cc63e3b8-8090-487f-98b4-7183151d9b7d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.compose import ColumnTransformer"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "6082d61c-ce00-43ef-aab6-4a41abdbd19c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "transformer = ColumnTransformer(transformers=[\n",
+    "    ('tnf1', SimpleImputer(),['fever']),\n",
+    "    ('tnf2', OrdinalEncoder(categories=[['Mild','Strong']]),['cough']),\n",
+    "    ('tnf3', OneHotEncoder(drop = 'first'),['gender','city'])\n",
+    "],remainder='passthrough')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "0ff8d611-831b-4fa3-82c5-8044b74a4cdd",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[102.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  74.        ],\n",
+       "       [100.98630137,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  34.        ],\n",
+       "       [102.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  64.        ],\n",
+       "       [104.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,   6.        ],\n",
+       "       [ 99.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  65.        ],\n",
+       "       [102.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  69.        ],\n",
+       "       [ 99.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  65.        ],\n",
+       "       [103.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  70.        ],\n",
+       "       [ 98.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  26.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  49.        ],\n",
+       "       [104.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  34.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  25.        ],\n",
+       "       [102.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  24.        ],\n",
+       "       [103.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  83.        ],\n",
+       "       [ 99.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  22.        ],\n",
+       "       [ 98.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  34.        ],\n",
+       "       [ 99.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  14.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,   5.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  51.        ],\n",
+       "       [ 98.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  12.        ],\n",
+       "       [ 98.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  83.        ],\n",
+       "       [ 98.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  73.        ],\n",
+       "       [104.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  17.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  38.        ],\n",
+       "       [101.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  14.        ],\n",
+       "       [100.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  13.        ],\n",
+       "       [103.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  60.        ],\n",
+       "       [103.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  50.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  83.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  44.        ],\n",
+       "       [100.98630137,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  38.        ],\n",
+       "       [ 98.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  31.        ],\n",
+       "       [104.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  54.        ],\n",
+       "       [101.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  15.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,   8.        ],\n",
+       "       [ 99.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  25.        ],\n",
+       "       [100.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  19.        ],\n",
+       "       [102.        ,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  49.        ],\n",
+       "       [102.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,   5.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  11.        ],\n",
+       "       [102.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  33.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  71.        ],\n",
+       "       [101.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  42.        ],\n",
+       "       [ 98.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  65.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  51.        ],\n",
+       "       [ 99.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  60.        ],\n",
+       "       [102.        ,   1.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  20.        ],\n",
+       "       [100.98630137,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  23.        ],\n",
+       "       [103.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  16.        ],\n",
+       "       [ 99.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  72.        ],\n",
+       "       [100.98630137,   1.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  71.        ],\n",
+       "       [ 98.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  24.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  20.        ],\n",
+       "       [ 99.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  59.        ],\n",
+       "       [101.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  68.        ],\n",
+       "       [101.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  51.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  19.        ],\n",
+       "       [100.98630137,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  20.        ],\n",
+       "       [101.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  34.        ],\n",
+       "       [ 98.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  23.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  16.        ],\n",
+       "       [101.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  19.        ],\n",
+       "       [100.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,   5.        ],\n",
+       "       [103.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  48.        ],\n",
+       "       [104.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  56.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  64.        ],\n",
+       "       [100.98630137,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  42.        ],\n",
+       "       [ 98.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  64.        ],\n",
+       "       [ 99.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  49.        ],\n",
+       "       [104.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  18.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  27.        ],\n",
+       "       [104.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  42.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  27.        ],\n",
+       "       [103.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  46.        ],\n",
+       "       [100.98630137,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  84.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  80.        ],\n",
+       "       [101.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  47.        ],\n",
+       "       [103.        ,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  73.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  69.        ],\n",
+       "       [104.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  12.        ]])"
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "transformer.fit_transform(x_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "b7c4b6ab-1237-4679-87d7-928e6e7c06f0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(80, 7)"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "transformer.fit_transform(x_train).shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "id": "ba3439f3-0bf9-418a-93be-7a6962a2ea1b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(20, 7)"
+      ]
+     },
+     "execution_count": 55,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "transformer.transform(x_test).shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "id": "6c3a47ca-baf4-4e6c-8d5b-7319b767ec26",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[102.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  82.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  81.        ],\n",
+       "       [100.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  47.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  81.        ],\n",
+       "       [103.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  69.        ],\n",
+       "       [101.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   1.        ,  65.        ],\n",
+       "       [ 98.        ,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  80.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  40.        ],\n",
+       "       [100.98630137,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  82.        ],\n",
+       "       [102.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  82.        ],\n",
+       "       [ 98.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  10.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  55.        ],\n",
+       "       [100.        ,   0.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  19.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  10.        ],\n",
+       "       [100.        ,   0.        ,   1.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  27.        ],\n",
+       "       [104.        ,   1.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  75.        ],\n",
+       "       [100.98630137,   0.        ,   0.        ,   1.        ,\n",
+       "          0.        ,   0.        ,  75.        ],\n",
+       "       [100.        ,   1.        ,   0.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  11.        ],\n",
+       "       [100.98630137,   1.        ,   1.        ,   0.        ,\n",
+       "          1.        ,   0.        ,  79.        ],\n",
+       "       [ 99.        ,   1.        ,   1.        ,   0.        ,\n",
+       "          0.        ,   0.        ,  66.        ]])"
+      ]
+     },
+     "execution_count": 56,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "transformer.transform(x_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "id": "cd9c97f9-767b-453b-b9e9-3cb65bd8bf8b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#2.using column transformer."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "id": "0e6a87c0-4b1d-431b-985c-1268440ffc40",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dfs = pd.read_csv('cars.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "id": "4b4900d2-f8e9-492a-9cfc-958df5939437",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8123</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>110000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>320000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8124</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>119000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Fourth &amp; Above Owner</td>\n",
+       "      <td>135000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8125</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>382000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8126</th>\n",
+       "      <td>Tata</td>\n",
+       "      <td>25000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>290000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8127</th>\n",
+       "      <td>Tata</td>\n",
+       "      <td>25000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>290000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>8128 rows × 5 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        brand  km_driven    fuel                 owner  selling_price\n",
+       "0      Maruti     145500  Diesel           First Owner         450000\n",
+       "1       Skoda     120000  Diesel          Second Owner         370000\n",
+       "2       Honda     140000  Petrol           Third Owner         158000\n",
+       "3     Hyundai     127000  Diesel           First Owner         225000\n",
+       "4      Maruti     120000  Petrol           First Owner         130000\n",
+       "...       ...        ...     ...                   ...            ...\n",
+       "8123  Hyundai     110000  Petrol           First Owner         320000\n",
+       "8124  Hyundai     119000  Diesel  Fourth & Above Owner         135000\n",
+       "8125   Maruti     120000  Diesel           First Owner         382000\n",
+       "8126     Tata      25000  Diesel           First Owner         290000\n",
+       "8127     Tata      25000  Diesel           First Owner         290000\n",
+       "\n",
+       "[8128 rows x 5 columns]"
+      ]
+     },
+     "execution_count": 63,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "id": "e82be1a3-0abf-4b45-bcc0-0aadbb3f5cb1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "id": "abf1191c-0c06-4694-890a-e78596baccd7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "brand\n",
+       "Maruti           2448\n",
+       "Hyundai          1415\n",
+       "Mahindra          772\n",
+       "Tata              734\n",
+       "Toyota            488\n",
+       "Honda             467\n",
+       "Ford              397\n",
+       "Chevrolet         230\n",
+       "Renault           228\n",
+       "Volkswagen        186\n",
+       "BMW               120\n",
+       "Skoda             105\n",
+       "Nissan             81\n",
+       "Jaguar             71\n",
+       "Volvo              67\n",
+       "Datsun             65\n",
+       "Mercedes-Benz      54\n",
+       "Fiat               47\n",
+       "Audi               40\n",
+       "Lexus              34\n",
+       "Jeep               31\n",
+       "Mitsubishi         14\n",
+       "Force               6\n",
+       "Land                6\n",
+       "Isuzu               5\n",
+       "Kia                 4\n",
+       "Ambassador          4\n",
+       "Daewoo              3\n",
+       "MG                  3\n",
+       "Ashok               1\n",
+       "Opel                1\n",
+       "Peugeot             1\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 66,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs['brand'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "id": "9b5fa89d-1dd6-4f52-a49e-83f19f16fb96",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<bound method IndexOpsMixin.value_counts of 0       Diesel\n",
+       "1       Diesel\n",
+       "2       Petrol\n",
+       "3       Diesel\n",
+       "4       Petrol\n",
+       "         ...  \n",
+       "8123    Petrol\n",
+       "8124    Diesel\n",
+       "8125    Diesel\n",
+       "8126    Diesel\n",
+       "8127    Diesel\n",
+       "Name: fuel, Length: 8128, dtype: object>"
+      ]
+     },
+     "execution_count": 67,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs['fuel'].value_counts"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "id": "7463190b-7caa-4eb1-aaa3-94638ecb3218",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "brand            0\n",
+       "km_driven        0\n",
+       "fuel             0\n",
+       "owner            0\n",
+       "selling_price    0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 68,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "id": "a3e73ba1-982e-480e-ab68-388bd5c9f5fb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#train_test_split\n",
+    "x_train,x_test,y_train,y_test = train_test_split(dfs.drop(columns = ['selling_price']),dfs['selling_price'], test_size = 0.2)\n",
+    " "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "id": "685702cd-4008-48e1-8b22-96d5d34d9de0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>3807</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>35000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4231</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>7032</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6478</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>70000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1301</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>110000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>49</th>\n",
+       "      <td>Mercedes-Benz</td>\n",
+       "      <td>27800</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2512</th>\n",
+       "      <td>Ford</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7739</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>70000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6061</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>195000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Second Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>744</th>\n",
+       "      <td>Mahindra</td>\n",
+       "      <td>80000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Third Owner</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5172</th>\n",
+       "      <td>Mahindra</td>\n",
+       "      <td>110000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>6502 rows × 4 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "              brand  km_driven    fuel         owner\n",
+       "3807         Maruti      35000  Petrol   First Owner\n",
+       "4231          Honda       7032  Petrol   First Owner\n",
+       "6478          Honda      70000  Diesel   First Owner\n",
+       "1301         Maruti     110000  Diesel   First Owner\n",
+       "49    Mercedes-Benz      27800  Diesel  Second Owner\n",
+       "...             ...        ...     ...           ...\n",
+       "2512           Ford     120000  Diesel   First Owner\n",
+       "7739        Hyundai      70000  Petrol   First Owner\n",
+       "6061         Maruti     195000  Petrol  Second Owner\n",
+       "744        Mahindra      80000  Diesel   Third Owner\n",
+       "5172       Mahindra     110000  Diesel   First Owner\n",
+       "\n",
+       "[6502 rows x 4 columns]"
+      ]
+     },
+     "execution_count": 73,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "id": "65545bbc-ee38-4a95-b49e-f5fd1413c3cf",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(6502, 4)"
+      ]
+     },
+     "execution_count": 75,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "id": "518e461f-2fb4-4578-a4ac-269c584b98fc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#we are using simpleimputer() for some columns..\n",
+    "si = SimpleImputer()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "17b32ade-5794-4614-b843-8565e6b397e9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "id": "c1dd4a78-1a22-4599-aa35-ac972cf1812e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 78,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "id": "20643410-13f3-4fba-b92c-f19bceda155d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#ordinal encoding in \"fuel\"..\n",
+    "oe = OrdinalEncoder(categories = [['CNG', 'LPG','Diesel','Petrol']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "id": "2ead3fd2-4738-4ef7-a057-b618bcde387f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "fuel\n",
+       "Diesel    4402\n",
+       "Petrol    3631\n",
+       "CNG         57\n",
+       "LPG         38\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 86,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    " dfs['fuel'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "id": "be0748b5-ad20-4000-903d-440e57fe37a1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#ordinalEncoding train in fuel\n",
+    "x_train_fuel = oe.fit_transform(x_train[['fuel']])\n",
+    "\n",
+    "#ordinal encoding in test in fuel\n",
+    "x_test_fuel = oe.fit_transform(x_train[['fuel']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "id": "4c85028e-aeb3-438f-8ebb-d3f20c1bda9a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[3.],\n",
+       "       [3.],\n",
+       "       [2.],\n",
+       "       ...,\n",
+       "       [3.],\n",
+       "       [2.],\n",
+       "       [2.]])"
+      ]
+     },
+     "execution_count": 89,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_fuel"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "id": "680d985c-ff7f-494f-bde9-a9c2b791c2a4",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(6502, 1)"
+      ]
+     },
+     "execution_count": 90,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_fuel.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 92,
+   "id": "19a5949c-e974-41ed-9610-5af8a5ccfbdf",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 92,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "id": "013f07bb-d0f6-4c00-a7b4-8756ead6d259",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "brand\n",
+       "Maruti           2448\n",
+       "Hyundai          1415\n",
+       "Mahindra          772\n",
+       "Tata              734\n",
+       "Toyota            488\n",
+       "Honda             467\n",
+       "Ford              397\n",
+       "Chevrolet         230\n",
+       "Renault           228\n",
+       "Volkswagen        186\n",
+       "BMW               120\n",
+       "Skoda             105\n",
+       "Nissan             81\n",
+       "Jaguar             71\n",
+       "Volvo              67\n",
+       "Datsun             65\n",
+       "Mercedes-Benz      54\n",
+       "Fiat               47\n",
+       "Audi               40\n",
+       "Lexus              34\n",
+       "Jeep               31\n",
+       "Mitsubishi         14\n",
+       "Force               6\n",
+       "Land                6\n",
+       "Isuzu               5\n",
+       "Kia                 4\n",
+       "Ambassador          4\n",
+       "Daewoo              3\n",
+       "MG                  3\n",
+       "Ashok               1\n",
+       "Opel                1\n",
+       "Peugeot             1\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 93,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs['brand'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "id": "8e9d738c-832e-4e0c-ae23-12d69ab08c67",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 95,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "id": "1c60c9f3-acb9-4007-8adb-66f9ecfb9c7e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#one hot encoding in sellin_price and km_driven\n",
+    "ohe = OneHotEncoder(drop = 'first')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 104,
+   "id": "a8d9b432-55ba-42a9-8522-ea2cfc1b3b48",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#for train data\n",
+    "x_train_km_selling = ohe.fit_transform(x_train[['brand','owner']])\n",
+    "\n",
+    "#for test data\n",
+    "x_test_km_selling = ohe.fit_transform(x_train[['brand','owner']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 105,
+   "id": "69cd412c-9126-48f9-8aaf-b727584dfc19",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<6502x35 sparse matrix of type '<class 'numpy.float64'>'\n",
+       "\twith 8769 stored elements in Compressed Sparse Row format>"
+      ]
+     },
+     "execution_count": 105,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_km_selling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 106,
+   "id": "e0678cae-5e7f-479c-a937-02b3ff4246a4",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(6502, 35)"
+      ]
+     },
+     "execution_count": 106,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_km_selling.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 107,
+   "id": "c9f4fbd9-9fb3-47b4-8e42-650997528df0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 107,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "id": "633146f7-2f4a-4edb-8f67-e286f20c670d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#for extracting km_driven .. train_test\n",
+    "x_train_driven = x_train.drop(columns=['brand', 'fuel', 'owner' ]).values\n",
+    "\n",
+    "#x_test..\n",
+    "x_test_driven = x_train.drop(columns=['brand', 'fuel', 'owner' ]).values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 111,
+   "id": "2eadce10-8c8b-49eb-9e10-5e8e7be18012",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[ 35000],\n",
+       "       [  7032],\n",
+       "       [ 70000],\n",
+       "       ...,\n",
+       "       [195000],\n",
+       "       [ 80000],\n",
+       "       [110000]], dtype=int64)"
+      ]
+     },
+     "execution_count": 111,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_driven"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 112,
+   "id": "b89b5cfa-4f51-4f50-9db5-3a495fd5f00e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(6502, 1)"
+      ]
+     },
+     "execution_count": 112,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_train_driven.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 113,
+   "id": "427d2239-08b5-48fd-9c4c-4d2d0219233c",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "all the input arrays must have same number of dimensions, but the array at index 0 has 2 dimension(s) and the array at index 1 has 0 dimension(s)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[113], line 2\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[38;5;66;03m#concatenate to each other..\u001b[39;00m\n\u001b[1;32m----> 2\u001b[0m X_train_transformed \u001b[38;5;241m=\u001b[39m np\u001b[38;5;241m.\u001b[39mconcatenate((x_train_driven, x_train_km_selling, x_train_fuel), axis \u001b[38;5;241m=\u001b[39m \u001b[38;5;241m1\u001b[39m)\n",
+      "\u001b[1;31mValueError\u001b[0m: all the input arrays must have same number of dimensions, but the array at index 0 has 2 dimension(s) and the array at index 1 has 0 dimension(s)"
+     ]
+    }
+   ],
+   "source": [
+    "#concatenate to each other..\n",
+    "X_train_transformed = np.concatenate((x_train_driven, x_train_km_selling, x_train_fuel), axis = 1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "23b12dcd-f218-412a-a358-d402315bea6d",
+   "metadata": {},
+   "source": [
+    "2. column transformer"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 114,
+   "id": "a0ca6f01-e7d0-437a-8fdb-f260ad50b5da",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>brand</th>\n",
+       "      <th>km_driven</th>\n",
+       "      <th>fuel</th>\n",
+       "      <th>owner</th>\n",
+       "      <th>selling_price</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>145500</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>450000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Skoda</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>Second Owner</td>\n",
+       "      <td>370000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Honda</td>\n",
+       "      <td>140000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>Third Owner</td>\n",
+       "      <td>158000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Hyundai</td>\n",
+       "      <td>127000</td>\n",
+       "      <td>Diesel</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>225000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Maruti</td>\n",
+       "      <td>120000</td>\n",
+       "      <td>Petrol</td>\n",
+       "      <td>First Owner</td>\n",
+       "      <td>130000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     brand  km_driven    fuel         owner  selling_price\n",
+       "0   Maruti     145500  Diesel   First Owner         450000\n",
+       "1    Skoda     120000  Diesel  Second Owner         370000\n",
+       "2    Honda     140000  Petrol   Third Owner         158000\n",
+       "3  Hyundai     127000  Diesel   First Owner         225000\n",
+       "4   Maruti     120000  Petrol   First Owner         130000"
+      ]
+     },
+     "execution_count": 114,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dfs.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9a2a1b9c-993b-4aaa-bad7-09dc93334b2d",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3436584e-3b59-4bf8-90f6-785a7f04ac1b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "684b5d86-89b7-421f-8593-b5ff0a3f8632",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4923f99b-984c-434e-826a-e0cb2d85bede",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f2197d92-6fb2-485e-8948-bcc1eb11ac8b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f6a20796-2a19-4e5c-a9b0-7f94a8193679",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
