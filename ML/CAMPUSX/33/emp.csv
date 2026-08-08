@@ -1,0 +1,16 @@
+customer_id,age,income,credit_score,loyalty_tier,education,employment_status,preferred_category,state,is_subscribed,churn
+CUST_101,28,45000.0,650,Silver,Bachelor,Employed,Electronics,MH,1,0
+CUST_102,45,82000.0,720,Gold,Master,Employed,Clothing,DL,1,0
+CUST_103,19,12000.0,580,Bronze,High School,Student,Electronics,UP,0,1
+CUST_104,34,,690,Gold,Bachelor,Employed,Home & Kitchen,KA,1,0
+CUST_105,52,115000.0,780,Platinum,Doctorate,Self-Employed,Books,MH,1,0
+CUST_106,23,28000.0,,Bronze,Bachelor,Unemployed,Clothing,DL,0,1
+CUST_107,41,67000.0,610,Silver,Master,Employed,Electronics,KA,1,0
+CUST_108,60,95000.0,740,Platinum,Master,Retired,Home & Kitchen,TN,1,0
+CUST_109,29,38000.0,600,Bronze,High School,Employed,Books,UP,0,1
+CUST_110,38,,710,Gold,Bachelor,Self-Employed,Electronics,MH,1,0
+CUST_111,50,140000.0,810,Platinum,Doctorate,Employed,Home & Kitchen,DL,1,0
+CUST_112,22,18000.0,550,Bronze,High School,Student,Clothing,HR,0,1
+CUST_113,31,52000.0,670,Silver,Bachelor,Employed,Electronics,TN,1,0
+CUST_114,47,88000.0,,Gold,Master,Self-Employed,Books,KA,0,0
+CUST_115,26,31000.0,630,Bronze,Bachelor,Unemployed,Clothing,MH,0,1
