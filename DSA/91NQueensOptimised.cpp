@@ -11,9 +11,8 @@ void addSolution(vector<vector<int>> &ans, vector<vector<int>> &board, int n) {
   ans.push_back(temp);
 }
 bool isSafe(int n, int col, int row, vector<vector<int>> &board,
-            unordered_map<int, bool> &rowBool,
-            unordered_map<int, bool> &uDiagonalBool,
-            unordered_map<int, bool> &lDiagonalBool) {
+            vector<bool> &rowBool, vector<bool> &uDiagonalBool,
+            vector<bool> &lDiagonalBool) {
   if (!rowBool[row] && !uDiagonalBool[n - 1 + col - row] &&
       !lDiagonalBool[col + row]) {
     return true;
@@ -21,9 +20,8 @@ bool isSafe(int n, int col, int row, vector<vector<int>> &board,
   return false;
 }
 void solve(int col, vector<vector<int>> &ans, vector<vector<int>> &board, int n,
-           unordered_map<int, bool> &rowBool,
-           unordered_map<int, bool> &uDiagonalBool,
-           unordered_map<int, bool> &lDiagonalBool) {
+           vector<bool> &rowBool, vector<bool> &uDiagonalBool,
+           vector<bool> &lDiagonalBool) {
   if (col == n) {
     addSolution(ans, board, n);
     return;
