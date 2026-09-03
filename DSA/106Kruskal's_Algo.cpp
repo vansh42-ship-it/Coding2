@@ -22,8 +22,7 @@ void unionSet(int u, int v, vector<int> &parent, vector<int> &rank) {
   v = findParent(parent, v);
   if (rank[u] < rank[v]) {
     parent[u] = v;
-  }
-  if (rank[v] < rank[u]) {
+  } else if (rank[v] < rank[u]) {
     parent[v] = u;
   } else {
     parent[v] = u;
@@ -40,7 +39,7 @@ int minimumSpanningTree(vector<vector<int>> &edges, int n) {
   for (int i = 0; i < edges.size(); i++) {
     int u = findParent(parent, edges[i][0]);
     int v = findParent(parent, edges[i][1]);
-    int wt = edges[1][2];
+    int wt = edges[i][2];
     if (u != v) {
       minWeight += wt;
       unionSet(u, v, parent, rank);

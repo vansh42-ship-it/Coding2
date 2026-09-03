@@ -27,10 +27,8 @@ vector<vector<int>> dfs(int node, int parent, int &timer, vector<int> &disc,
       low[node] = min(low[node], disc[nbr]);
     }
   }
-
   return result;
 }
-
 vector<vector<int>> findBridges(vector<vector<int>> &edges, int v, int e) {
   unordered_map<int, list<int>> adj;
   for (int i = 0; i < edges.size(); i++) {
@@ -40,7 +38,6 @@ vector<vector<int>> findBridges(vector<vector<int>> &edges, int v, int e) {
     adj[u].push_back(v);
     adj[v].push_back(u);
   }
-
   int timer = 0;
   vector<int> disc(v, -1);
   vector<int> low(v, -1);
